@@ -8,7 +8,8 @@ from django.http import HttpResponse
 from django.contrib.auth.models import User
 
 # from models import School, Kitchen, Manager
-from food.models import *
+from models import *
+
 
 
 @require_POST
@@ -92,3 +93,53 @@ def update_attendance(request):
 
     school_attendance.save()
 
+
+@require_POST
+def last_seven_days(request):
+    manager_id = request.POST.get('manager_id', 1)
+    kitchen_id = Manager.objects.get(id=manager_id).kitchen_id
+
+    schools = School.objects.filter(kitchen_id=kitchen_id)
+
+    for school in schools:
+        school_attendance = Attendance.objects.filter(school_id=school.id,
+                                                      date__range=[
+                                                          str(datetime.date.today() - datetime.timedelta(days=7)),
+                                                          str(datetime.date.today())
+                                                      ])
+
+        school_consumption = SchoolConsumption.objects.filter(school_id=school.id,
+                                                              date__range=[
+                                                                  str(datetime.date.today() - datetime.timedelta(
+                                                                      days=7
+                                                                  )),
+                                                                  str(datetime.date.today())
+                                                              ])
+
+        expected_attendance = ExpectedAttendance.objects.filter(school_id=school.id,
+                                                                date__range=[
+                                                                    str(datetime.date.today() - datetime.timedelta(
+                                                                        days=7
+                                                                    )),
+                                                                    str(datetime.date.today())
+                                                                ])
+
+        expected_consumption = ExpectedConsumption.objects.filter(school_id=school.id,
+                                                                  date__range=[
+                                                                      str(datetime.date.today() - datetime.timedelta(
+                                                                          days=7
+                                                                      )),
+                                                                      str(datetime.date.today())
+                                                                  ])
+        result_data = []
+
+        vals_past = zip(school_attendance, school_consumption)
+        vals_expected = zip(expected_attendance, expected_consumption)
+
+        for data in vals_past:
+            result_data.append([data[0].primary, data[0].consumption])
+
+        for data in vals_expected:
+            result_data.append([data[0].primary, data[0].consumption])
+
+    return HttpResponse(json.dumps({'Rice': result_data}))

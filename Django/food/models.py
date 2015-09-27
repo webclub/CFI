@@ -2,6 +2,7 @@ import datetime
 
 from django.contrib.auth.models import User
 from django.db import models
+from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django_extensions.db.fields import CreationDateTimeField, ModificationDateTimeField
 from django.utils.timezone import now
@@ -82,11 +83,11 @@ class ExpectedAttendance(TimeStampedModel):
     school = models.ForeignKey(School)
     primary = models.IntegerField(default=0)
     secondary = models.IntegerField(default=0)
-    date = models.DateField()
+    date = models.DateField(default=timezone.now().date())
 
 
 class ExpectedConsumption(TimeStampedModel):
     school = models.ForeignKey(School)
     item = models.ForeignKey(Item)
     consumption = models.IntegerField(default=0)
-    date = models.DateField()
+    date = models.DateField(default=timezone.now().date())
