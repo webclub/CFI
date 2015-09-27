@@ -1,5 +1,6 @@
 import datetime
 import json
+import traceback
 
 from django.shortcuts import render
 from django.views.decorators.http import require_POST
@@ -11,7 +12,16 @@ from django.contrib.auth.models import User
 # from models import School, Kitchen, Manager
 from models import *
 
+ACC_HEADERS = {'Access-Control-Allow-Origin': '*', 
+               'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+               'Access-Control-Max-Age': 1000,
+               'Access-Control-Allow-Headers': '*'}
 
+
+def modify(response):
+    for key, value in ACC_HEADERS.iteritems():
+        response[key] = value
+    return response
 
 @require_POST
 @csrf_exempt
@@ -21,10 +31,10 @@ def register_kitchen(request):
 
     kitchen = Kitchen.objects.create(name=name, kitchen_type=kitchen_type)
 
-    return HttpResponse(json.dumps({'message': 'Kitchen done',
+    return modify(HttpResponse(json.dumps({'message': 'Kitchen done',
                                     'kitchen_id': kitchen.id,
                         })
-    )
+    ))
 
 @require_POST
 @csrf_exempt
@@ -33,9 +43,9 @@ def register_school(request):
     kitchen_id = request.POST.get('kitchen_id', 1)
 
     school = School.objects.create(name=name, kitchen_id=kitchen_id)
-    return HttpResponse(json.dumps({'message': 'School Registration Successful',
+    return modify(HttpResponse(json.dumps({'message': 'School Registration Successful',
                                     'school_id': school.id,
-                        }))
+                        })))
 
 
 @require_POST
@@ -53,7 +63,7 @@ def register_teacher(request):
     teacher = Teacher.objects.create(user_id=user.id, school_id=school.id,
                                      role=role)
 
-    return HttpResponse(json.dumps({'message': 'Teacher Registration Successful'}))
+    return modify(HttpResponse(json.dumps({'message': 'Teacher Registration Successful'})))
 
 
 @require_POST
@@ -71,7 +81,7 @@ def register_manager(request):
     manager = Manager.objects.create(user_id=user.id, kitchen_id=kitchen.id,
                                      role=role)
 
-    return HttpResponse(json.dumps({'message': 'Manager Registration Successful'}))
+    return modify(HttpResponse(json.dumps({'message': 'Manager Registration Successful'})))
 
 
 @require_POST
@@ -94,7 +104,7 @@ def update_attendance(request):
         school_attendance.primary += school_attendance.primary + attendance_count
 
     school_attendance.save()
-    return HttpResponse(json.dumps({'message': 'Attendance Updation Successful'}))
+    return modify(HttpResponse(json.dumps({'message': 'Attendance Updation Successful'})))
 
 
 @require_POST
@@ -106,11 +116,11 @@ def add_comment(request):
     comment_for_school = Comments.objects.create(school_id=teacher.school_id,
                                                  comment=comment)
 
-    return HttpResponse(json.dumps({
+    return modify(HttpResponse(json.dumps({
                                 'message': 'Comment Added',
                                 'comment_id': comment_for_school.id,
                         })
-    )
+    ))
 
 
 @csrf_exempt
@@ -132,7 +142,7 @@ def get_comments(request):
         print len(comment['messages'])
         comments.append(comment)
 
-    return HttpResponse(json.dumps(comments))
+    return modify(HttpResponse(json.dumps(comments)))
 
 
 @require_POST
@@ -144,11 +154,11 @@ def add_feedback(request):
     feedback_for_school = Feedback.objects.create(school_id=teacher.school_id,
                                                  feedback=feedback)
 
-    return HttpResponse(json.dumps({
+    return modify(HttpResponse(json.dumps({
                                 'message': 'Comment Added',
                                 'feedback_id': feedback_for_school.id,
                         })
-    )
+    ))
 
 
 @csrf_exempt
@@ -170,7 +180,7 @@ def get_feedback(request):
         print len(comment['messages'])
         comments.append(comment)
 
-    return HttpResponse(json.dumps(comments))
+    return modify(HttpResponse(json.dumps(comments)))
 
 
 @require_POST
@@ -184,18 +194,23 @@ def add_units(request):
     data = request.POST.get('data', '')
     data = json.loads(data)
 
-    for key, value in data.iteritems():
-        consumption = SchoolConsumption.objects.create(school_id=school_id,
-                                                       item_id=key)
-        consumption.unit_consumed = value['consumed']
-        consumption.unit_left = value['left']
+    try:
+        for key, value in data.iteritems():
+            key = int(key)
+            consumption = SchoolConsumption.objects.create(school_id=school_id,
+                                                           item_id=key)
+            consumption.unit_consumed = value['consumed']
+            consumption.unit_left = value['left']
 
-        consumption.save()
+            consumption.save()
 
-    return HttpResponse(json.dumps({
-                                'message': 'Units updated',
-                    })
-    )
+        return modify(HttpResponse(json.dumps({
+                                    'message': 'Units updated',
+                        })
+        ))
+    except:
+        print traceback.format_exc()
+        return modify(HttpResponse(''))
 
 
 @require_POST
@@ -246,4 +261,4 @@ def last_seven_days(request):
         for data in vals_expected:
             result_data.append([data[0].primary, data[0].consumption])
 
-    return HttpResponse(json.dumps({'Rice': result_data}))
+    return modify(HttpResponse(json.dumps({'Rice': result_data})))
