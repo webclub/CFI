@@ -4,6 +4,7 @@ import json
 from django.shortcuts import render
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
+from django.utils import timezone
 from django.http import HttpResponse
 from django.contrib.auth.models import User
 
@@ -77,21 +78,80 @@ def register_manager(request):
 @csrf_exempt
 def update_attendance(request):
     teacher_id = request.POST.get('teacher_id', 1)
-    attendance_count = request.POST.get('attendance_count', 0)
-    teacher = Teacher.objects.get(teacher_id=teacher_id)
+    attendance_count = int(request.POST.get('attendance_count', 0))
+    teacher = Teacher.objects.get(id=teacher_id)
 
     try:
         school_attendance = Attendance.objects.get(school_id=teacher.school_id,
-                                                   date=datetime.date.today)
+                                                   date=timezone.now().date())
     except Attendance.DoesNotExist:
-        school_attendance = Attendance.objects.create(school_id=teacher.school_id)
+        school_attendance = Attendance.objects.create(school_id=teacher.school_id,
+                                                      date=timezone.now().date())
 
     if teacher.role:
-        school_attendance.secondary += attendance_count
+        school_attendance.secondary = school_attendance.secondary + attendance_count
     else:
-        school_attendance.primary += attendance_count
+        school_attendance.primary += school_attendance.primary + attendance_count
 
     school_attendance.save()
+    return HttpResponse(json.dumps({'message': 'Attendance Updation Successful'}))
+
+
+@require_POST
+@csrf_exempt
+def add_comment(request):
+    teacher_id = request.POST.get('teacher_id', 1)
+    comment = request.POST.get('comment', '')
+    teacher = Teacher.objects.get(id=teacher_id)
+    comment_for_school = Comments.objects.create(school_id=teacher.school_id,
+                                                 comment=comment)
+
+    return HttpResponse(json.dumps({
+                                'message': 'Comment Added',
+                                'comment_id': comment_for_school.id,
+                        })
+    )
+
+
+@require_POST
+@csrf_exempt
+def add_feedback(request):
+    teacher_id = request.POST.get('teacher_id', 1)
+    feedback = request.POST.get('feedback', '')
+    teacher = Teacher.objects.get(id=teacher_id)
+    feedback_for_school = Feedback.objects.create(school_id=teacher.school_id,
+                                                 feedback=feedback)
+
+    return HttpResponse(json.dumps({
+                                'message': 'Comment Added',
+                                'feedback_id': feedback_for_school.id,
+                        })
+    )
+
+
+@require_POST
+@csrf_exempt
+def add_units(request):
+    teacher_id = request.POST.get('teacher_id', 1)
+
+    teacher = Teacher.objects.get(id=teacher_id)
+    school_id = teacher.school_id
+
+    data = request.POST.get('data', '')
+    data = json.loads(data)
+
+    for key, value in data.iteritems():
+        consumption = SchoolConsumption.objects.create(school_id=school_id,
+                                                       item_id=key)
+        consumption.unit_consumed = value['consumed']
+        consumption.unit_left = value['left']
+
+        consumption.save()
+
+    return HttpResponse(json.dumps({
+                                'message': 'Units updated',
+                    })
+    )
 
 
 @require_POST

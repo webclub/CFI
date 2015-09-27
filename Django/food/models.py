@@ -5,7 +5,7 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django_extensions.db.fields import CreationDateTimeField, ModificationDateTimeField
-from django.utils.timezone import now
+from django.utils import timezone
 
 class TimeStampedModel(models.Model):
     """ TimeStampedModel
@@ -59,14 +59,14 @@ class SchoolConsumption(models.Model):
     item = models.ForeignKey(Item)
     unit_consumed = models.IntegerField(default=0)
     unit_left = models.IntegerField(default=0)
-    date = models.DateField()
+    date = models.DateField(timezone.now().date(), null=True)
 
 
 class Attendance(models.Model):
     school = models.ForeignKey(School)
     primary = models.IntegerField(default=0)
     secondary = models.IntegerField(default=0)
-    date = models.DateField()
+    date = models.DateField(timezone.now().date(), null=True)
 
 
 class Comments(TimeStampedModel):
@@ -83,11 +83,11 @@ class ExpectedAttendance(TimeStampedModel):
     school = models.ForeignKey(School)
     primary = models.IntegerField(default=0)
     secondary = models.IntegerField(default=0)
-    date = models.DateField(default=timezone.now().date())
+    date = models.DateField(timezone.now().date(), null=True)
 
 
 class ExpectedConsumption(TimeStampedModel):
     school = models.ForeignKey(School)
     item = models.ForeignKey(Item)
     consumption = models.IntegerField(default=0)
-    date = models.DateField(default=timezone.now().date())
+    date = models.DateField(timezone.now().date(), null=True)
