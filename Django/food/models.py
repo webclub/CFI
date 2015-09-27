@@ -1,0 +1,71 @@
+import datetime
+
+from django.contrib.auth.models import User
+from django.db import models
+from django.utils.translation import ugettext_lazy as _
+from django_extensions.db.fields import CreationDateTimeField, ModificationDateTimeField
+
+
+class TimeStampedModel(models.Model):
+    """ TimeStampedModel
+    An abstract base class model that provides self-managed "created" and
+    "modified" fields.
+    """
+    created = CreationDateTimeField(_('created'))
+    modified = ModificationDateTimeField(_('modified'))
+
+    class Meta:
+        get_latest_by = 'modified'
+        ordering = ('-modified', '-created',)
+        abstract = True
+
+
+class Kitchen(models.Model):
+    name = models.CharField(max_length=1000)
+    latitude = models.FloatField()
+    longitude = models.FloatField()
+
+    kitchen_type = models.CharField(max_length=1000)
+
+
+class School(models.Model):
+    name = models.CharField(max_length=1000)
+    latitude = models.FloatField()
+    longitude = models.FloatField()
+    kitchen = models.ForeignKey(Kitchen)
+
+
+class Manager(models.Model):
+    user = models.ForeignKey(User)
+    kitchen = models.ForeignKey(Kitchen)
+    role = models.IntegerField(default=1)
+
+
+class Teacher(models.Model):
+    user = models.ForeignKey(User)
+    school = models.ForeignKey(School)
+    role = models.IntegerField(default=1)
+
+
+class SchoolConsumption(models.Model):
+    school = models.ForeignKey(School)
+    unit_consumed = models.IntegerField(default=0)
+    unit_left = models.IntegerField(default=0)
+    date = models.DateField(default=datetime.date.today)
+
+
+class Attendance(models.Model):
+    school = models.ForeignKey(School)
+    primary = models.IntegerField(default=0)
+    secondary = models.IntegerField(default=0)
+    date = models.DateField(default=datetime.date.today)
+
+
+class Comments(TimeStampedModel):
+    school = models.ForeignKey(School)
+    comment = models.CharField(max_length=10000)
+
+
+class Feedback(TimeStampedModel):
+    school = models.ForeignKey(School)
+    feedback = models.CharField(max_length=10000)
