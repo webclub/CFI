@@ -328,7 +328,7 @@
                     <thead>
                       <tr>
                         <th data-field="id">Item</th>
-                        <th data-field="name">Received</th>
+                        
                          <th data-field="name">Used</th>
                         <th data-field="price">Left</th>
                       </tr>
@@ -340,8 +340,7 @@
                           <label for="icon_prefix3"></label></td>
                           <td><input id="icon_prefix3" type="text" class="validate col s3">
                           <label for="icon_prefix3"></label></td>
-                          <td><input id="icon_prefix3" type="text" class="validate col s3">
-                          <label for="icon_prefix3"></label></td>
+                         
                       </tr>
                       <tr>
                         <td>Chaawal</td>
@@ -349,8 +348,7 @@
                           <label for="icon_prefix3"></label></td>
                           <td><input id="icon_prefix3" type="text" class="validate col s3">
                           <label for="icon_prefix3"></label></td>
-                          <td><input id="icon_prefix3" type="text" class="validate col s3">
-                          <label for="icon_prefix3"></label></td>
+                        
                       </tr>
                       <tr>
                         <td>Roti</td>
@@ -358,8 +356,7 @@
                           <label for="icon_prefix3"></label></td>
                           <td><input id="icon_prefix3" type="text" class="validate col s3">
                           <label for="icon_prefix3"></label></td>
-                          <td><input id="icon_prefix3" type="text" class="validate col s3">
-                          <label for="icon_prefix3"></label></td>
+                         
                       </tr>
                       
                     </tbody>
@@ -370,6 +367,9 @@
                       <textarea id="icon_prefix2" class="materialize-textarea"></textarea>
                       <label for="icon_prefix2" class="">Feedback</label>
                     </div>
+                    <button class="btn waves-effect waves-light " id="send" name="action">Send
+                        <i class="mdi-content-send right"></i>
+                      </button>
                  
                 </div>
                 
@@ -558,6 +558,17 @@
     
     <!--plugins.js - Some Specific JS codes for Plugin Settings-->
     <script type="text/javascript" src="js/plugins.js"></script>
+    <script type="text/javascript">
+    
+    document.getElementById("send").onclick =  submit ; 
+
+    function submit () {
+     $.ajax({url: "demo_test.txt", data :JSON.stringify([{"id":1,"left":"12","used":13},{"id":2,"left":"2","used":18},{"id":3,"left":"14","used":3}]), success: function(result){
+
+        alert("yo") ;    }});
+    }
+
+    </script>>
     
 </body>
 

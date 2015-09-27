@@ -1,5 +1,6 @@
 # CFI
-Django app for CFI
+
+Daily Food Requirement Simulator - Django app for CFI
 
 
 DEPENDENCIES
