@@ -113,6 +113,28 @@ def add_comment(request):
     )
 
 
+@csrf_exempt
+@require_POST
+def get_comments(request):
+    manager_id = request.POST.get('manager_id', '')
+    kitchen_id = Manager.objects.get(id=manager_id).kitchen_id
+
+    schools = School.objects.filter(kitchen_id=kitchen_id)
+
+    comments = []
+
+    for school in schools:
+        comment = {}
+        comment['school'] = school.name
+        comment['messages'] = Comments.objects.filter(school_id=school.id,
+                                                      created=timezone.now().date()).values_list('comment',
+                                                                                            flat=True)
+        print len(comment['messages'])
+        comments.append(comment)
+
+    return HttpResponse(json.dumps(comments))
+
+
 @require_POST
 @csrf_exempt
 def add_feedback(request):
@@ -127,6 +149,28 @@ def add_feedback(request):
                                 'feedback_id': feedback_for_school.id,
                         })
     )
+
+
+@csrf_exempt
+@require_POST
+def get_feedback(request):
+    manager_id = request.POST.get('manager_id', '')
+    kitchen_id = Manager.objects.get(id=manager_id).kitchen_id
+
+    schools = School.objects.filter(kitchen_id=kitchen_id)
+
+    comments = []
+
+    for school in schools:
+        comment = {}
+        comment['school'] = school.name
+        comment['messages'] = Feedback.objects.filter(school_id=school.id,
+                                                      created=timezone.now().date()).values_list('feedback',
+                                                                                            flat=True)
+        print len(comment['messages'])
+        comments.append(comment)
+
+    return HttpResponse(json.dumps(comments))
 
 
 @require_POST

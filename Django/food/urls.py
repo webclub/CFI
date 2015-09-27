@@ -10,6 +10,9 @@ urlpatterns = [
     url(r'^reg_manager/', register_manager),
     url(r'^update_attendance/', update_attendance),
     url(r'^add_comment/', add_comment),
+    url(r'^get_comments/', get_comments),
     url(r'^add_feedback/', add_feedback),
+    url(r'^get_feedback/', get_feedback),
     url(r'^add_units/', add_units),
+    url(r'^get_kitchen_data/', last_seven_days),
 ]
