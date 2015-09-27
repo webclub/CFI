@@ -35,6 +35,10 @@ class School(models.Model):
     kitchen = models.ForeignKey(Kitchen)
 
 
+class Item(models.Model):
+    name = models.CharField(max_length=100)
+
+
 class Manager(models.Model):
     user = models.ForeignKey(User)
     kitchen = models.ForeignKey(Kitchen)
@@ -44,11 +48,14 @@ class Manager(models.Model):
 class Teacher(models.Model):
     user = models.ForeignKey(User)
     school = models.ForeignKey(School)
+
+    # role: primary or secondary
     role = models.IntegerField(default=1)
 
 
 class SchoolConsumption(models.Model):
     school = models.ForeignKey(School)
+    item = models.ForeignKey(Item)
     unit_consumed = models.IntegerField(default=0)
     unit_left = models.IntegerField(default=0)
     date = models.DateField(default=datetime.date.today)
@@ -69,3 +76,15 @@ class Comments(TimeStampedModel):
 class Feedback(TimeStampedModel):
     school = models.ForeignKey(School)
     feedback = models.CharField(max_length=10000)
+
+
+class ExpectedAttendance(TimeStampedModel):
+    school = models.ForeignKey(School)
+    primary = models.IntegerField(default=0)
+    secondary = models.IntegerField(default=0)
+
+
+class ExpectedConsumption(TimeStampedModel):
+    school = models.ForeignKey(School)
+    item = models.ForeignKey(Item)
+    consumption = models.IntegerField(default=0)
