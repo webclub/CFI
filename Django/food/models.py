@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django_extensions.db.fields import CreationDateTimeField, ModificationDateTimeField
-
+from django.utils.timezone import now
 
 class TimeStampedModel(models.Model):
     """ TimeStampedModel
@@ -22,16 +22,16 @@ class TimeStampedModel(models.Model):
 
 class Kitchen(models.Model):
     name = models.CharField(max_length=1000)
-    latitude = models.FloatField()
-    longitude = models.FloatField()
+    latitude = models.FloatField(default=77.8)
+    longitude = models.FloatField(default=22.7)
 
     kitchen_type = models.CharField(max_length=1000)
 
 
 class School(models.Model):
     name = models.CharField(max_length=1000)
-    latitude = models.FloatField()
-    longitude = models.FloatField()
+    latitude = models.FloatField(default=77.8)
+    longitude = models.FloatField(default=22.7)
     kitchen = models.ForeignKey(Kitchen)
 
 
@@ -58,14 +58,14 @@ class SchoolConsumption(models.Model):
     item = models.ForeignKey(Item)
     unit_consumed = models.IntegerField(default=0)
     unit_left = models.IntegerField(default=0)
-    date = models.DateField(default=datetime.date.today)
+    date = models.DateField()
 
 
 class Attendance(models.Model):
     school = models.ForeignKey(School)
     primary = models.IntegerField(default=0)
     secondary = models.IntegerField(default=0)
-    date = models.DateField(default=datetime.date.today)
+    date = models.DateField()
 
 
 class Comments(TimeStampedModel):
