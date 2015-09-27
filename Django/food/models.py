@@ -82,9 +82,11 @@ class ExpectedAttendance(TimeStampedModel):
     school = models.ForeignKey(School)
     primary = models.IntegerField(default=0)
     secondary = models.IntegerField(default=0)
+    date = models.DateField()
 
 
 class ExpectedConsumption(TimeStampedModel):
     school = models.ForeignKey(School)
     item = models.ForeignKey(Item)
     consumption = models.IntegerField(default=0)
+    date = models.DateField()
