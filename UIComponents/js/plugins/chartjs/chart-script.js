@@ -40,14 +40,15 @@ var xyValues = { values:[[5,10],[6,20]] };
 
 
 function update() {
-	var data ={ labels:["Sun","Mon","Tue","Wed","Thu","Fri","Sat"]};
+	var data ={ labels:["20Sept","21Sept","22Sept","23Sept","24Sept","25Sept","26Sept","27Sept","28Sept","29Sept","30Sept"]};
 	console.log(data.labels);
 
+	var new_data = {  labels:[[72,78],[72,74],[62,64],[61,58],[69,68],[56,60],[62,62],[0,72],[0,64],[0,60] ]}
 	nReloads++;
 
 	var x = Math.floor(Math.random() * (max - min + 1)) + min;
 	var y = Math.floor(Math.random() * (max - min + 1)) + min;
-	trendingLineChart.addData([x,y], data.labels[l]);
+	trendingLineChart.addData(new_data.lables[l], data.labels[l]);
 	//console.log(xyValues.coords[0]);
 	trendingLineChart.removeData();
 	l = (l+1)%data.labels.length;
